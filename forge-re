@@ -1,0 +1,37 @@
+import sys
+import os
+
+def print_banner():
+    print("=" * 60)
+    print("               Forge-RE - Binary Analyzer")
+    print("=" * 60)
+
+def analyze_file(filepath):
+    if not os.path.exists(filepath):
+        print(f"[Erro] Arquivo não encontrado: {filepath}")
+        return
+
+    print(f"\n[+] Analisando arquivo: {filepath}")
+    file_size = os.path.getsize(filepath)
+    print(f"[*] Tamanho do arquivo: {file_size} bytes")
+
+    with open(filepath, "rb") as f:
+        header = f.read(4)
+        print(f"[*] Magic Bytes (Hex): {header.hex()}")
+
+        if header.startswith(b"MZ"):
+            print("[*] Formato detectado: Executável PE (Windows)")
+        elif header.startswith(b"\x7fELF"):
+            print("[*] Formato detectado: Executável ELF (Linux)")
+        elif header.startswith(b"\xca\xfe\xba\xbe") or header.startswith(b"\xcf\xfa\xed\xfe"):
+            print("[*] Formato detectado: Executável Mach-O (macOS)")
+        else:
+            print("[?] Formato desconhecido ou dados brutos.")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Uso: python main.py <caminho_do_binario>")
+        sys.exit(1)
+
+    print_banner()
+    analyze_file(sys.argv[1])
